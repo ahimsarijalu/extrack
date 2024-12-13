@@ -1,0 +1,12 @@
+services:
+  extrack:
+    container_name: extrack
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=ahimsarijalu
+      - POSTGRES_PASSWORD=Password*123
+      - POSTGRES_DB=expense
+      - POSTGRES_ROOT_PASSWORD=Password*123
+    ports:
+      - "7541:5432"

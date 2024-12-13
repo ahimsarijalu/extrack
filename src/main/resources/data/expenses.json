@@ -1,0 +1,84 @@
+{
+  "expenses": [
+    {
+      "title": "Superindo",
+      "description": "Belanja bulanan",
+      "amount": 160000.0,
+      "category": "GROCERIES",
+      "expenseDate": "2024-12-10T14:00:28.5004763",
+      "id": 1
+    },
+    {
+      "title": "Superindo",
+      "description": "Beli buah",
+      "amount": 55000.0,
+      "category": "GROCERIES",
+      "expenseDate": "2024-12-11T14:00:28.5004763",
+      "id": 2
+    },
+    {
+      "title": "XXI Cawang",
+      "description": "Nonton Film",
+      "amount": 35000.0,
+      "category": "ENTERTAINMENT",
+      "expenseDate": "2024-12-12T14:00:28.5004763",
+      "id": 3
+    },
+    {
+      "title": "Grab",
+      "description": "Perjalanan ke kantor",
+      "amount": 45000.0,
+      "category": "TRAVEL",
+      "expenseDate": "2024-12-10T08:00:00.0000000",
+      "id": 4
+    },
+    {
+      "title": "Starbucks",
+      "description": "Kopi pagi",
+      "amount": 60000.0,
+      "category": "FOOD",
+      "expenseDate": "2024-12-11T09:30:00.0000000",
+      "id": 5
+    },
+    {
+      "title": "McDonald's",
+      "description": "Makan siang",
+      "amount": 75000.0,
+      "category": "FOOD",
+      "expenseDate": "2024-12-12T12:15:00.0000000",
+      "id": 6
+    },
+    {
+      "title": "Indomaret",
+      "description": "Beli snack",
+      "amount": 25000.0,
+      "category": "GROCERIES",
+      "expenseDate": "2024-12-12T18:00:00.0000000",
+      "id": 7
+    },
+    {
+      "title": "Netflix",
+      "description": "Langganan bulanan",
+      "amount": 150000.0,
+      "category": "ENTERTAINMENT",
+      "expenseDate": "2024-12-01T00:00:00.0000000",
+      "id": 8
+    },
+    {
+      "title": "Shell",
+      "description": "Isi bensin",
+      "amount": 200000.0,
+      "category": "OTHER",
+      "expenseDate": "2024-12-08T17:00:00.0000000",
+      "id": 9
+    },
+    {
+      "title": "Tokopedia",
+      "description": "Beli buku",
+      "amount": 100000.0,
+      "category": "OTHER",
+      "expenseDate": "2024-12-05T14:45:00.0000000",
+      "id": 10
+    }
+  ]
+}
