@@ -26,7 +26,7 @@ public class UserService {
     public UserDTO getUserById(String id) {
         return userRepository.findById(UUID.fromString(id))
                 .map(UserUtils::mapUserToDTO)
-                .orElse(null);
+                .orElseThrow(() -> new UserNotFoundException(id));
     }
 
     public UserDTO saveUser(UserDTO userDTO) {

@@ -43,6 +43,10 @@ public class UserController {
 //            user.setExpenses(expenseService.getAllExpenseByUserId(id));
             response = mapToApiResponse(HttpStatus.OK.value(), true, "Users fetched successfully", user);
         } catch (Exception e) {
+            if (e instanceof UserNotFoundException) {
+                response = mapToApiResponse(HttpStatus.NOT_FOUND.value(), false, "Failed to fetch users, Reason: " + e.getMessage(), null);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
             response = mapToApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), false, "Failed to fetch users", null);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }

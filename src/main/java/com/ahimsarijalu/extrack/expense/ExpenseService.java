@@ -35,7 +35,7 @@ public class ExpenseService {
     public ExpenseDTO getExpenseById(String id) {
         return expenseRepository.findById(UUID.fromString(id))
                 .map(ExpenseUtil::mapExpenseToDTO)
-                .orElse(null);
+                .orElseThrow(() -> new ExpenseNotFoundException(id));
     }
 
     public ExpenseDTO saveExpense(ExpenseDTO expenseDTO) {
