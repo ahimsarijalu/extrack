@@ -54,6 +54,9 @@ public class UserService {
 
 
     public void deleteUser(String id) {
+        if (userRepository.findById(UUID.fromString(id)).isEmpty()) {
+            throw new UserNotFoundException(id);
+        }
         userRepository.deleteById(UUID.fromString(id));
     }
 }

@@ -3,6 +3,7 @@ package com.ahimsarijalu.extrack.expense;
 import com.ahimsarijalu.extrack.user.User;
 import com.ahimsarijalu.extrack.user.UserNotFoundException;
 import com.ahimsarijalu.extrack.user.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,7 @@ import static com.ahimsarijalu.extrack.expense.ExpenseUtil.mapExpenseToDTO;
 import static com.ahimsarijalu.extrack.utils.MapperUtil.mapDTOToEntity;
 
 
+@Slf4j
 @Service
 public class ExpenseService {
 
@@ -69,7 +71,11 @@ public class ExpenseService {
     }
 
     public void deleteExpense(String id) {
+        if (expenseRepository.findById(UUID.fromString(id)).isEmpty()) {
+            throw new ExpenseNotFoundException(id);
+        }
         expenseRepository.deleteById(UUID.fromString(id));
+
     }
 
     public List<ExpenseDTO> getAllExpensesByCategory(Category category) {

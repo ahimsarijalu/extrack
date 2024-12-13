@@ -1,7 +1,5 @@
 package com.ahimsarijalu.extrack.user;
 
-import com.ahimsarijalu.extrack.expense.ExpenseDTO;
-import com.ahimsarijalu.extrack.expense.ExpenseService;
 import com.ahimsarijalu.extrack.utils.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -86,8 +84,11 @@ public class UserController {
         try {
             userService.deleteUser(id);
             response = mapToApiResponse(HttpStatus.OK.value(), true, "User deleted successfully", null);
-
         } catch (Exception e) {
+            if (e instanceof UserNotFoundException) {
+                response = mapToApiResponse(HttpStatus.NOT_FOUND.value(), false, "Failed to delete user, Reason: " + e.getMessage(), null);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
             response = mapToApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), false, "Failed to delete user, Reason: " + e.getMessage(), null);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }

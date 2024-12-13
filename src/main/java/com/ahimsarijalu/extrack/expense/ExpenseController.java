@@ -89,6 +89,10 @@ public class ExpenseController {
             expenseService.deleteExpense(id);
             response = mapToApiResponse(HttpStatus.OK.value(), true, "Expense deleted successfully", null);
         } catch (Exception e) {
+            if (e instanceof ExpenseNotFoundException) {
+                response = mapToApiResponse(HttpStatus.NOT_FOUND.value(), false, "Failed to delete expense, Reason: " + e.getMessage(), null);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
             response = mapToApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), false, "Failed to delete expense, Reason: " + e.getMessage(), null);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
