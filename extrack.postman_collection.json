@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "33bf160d-56c1-495d-b125-b5dcef435cb9",
-		"name": "Extrack",
+		"name": "extrack",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "34389919",
 		"_collection_link": "https://letmecookcozimcookedenough.postman.co/workspace/Team-Workspace~a3aee446-d604-41a8-8021-4cc95981739e/collection/34389919-33bf160d-56c1-495d-b125-b5dcef435cb9?action=share&source=collection_link&creator=34389919"
@@ -628,18 +628,36 @@
 					},
 					"response": []
 				}
+			],
+			"auth": {
+				"type": "noauth"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
 			]
 		}
 	],
 	"auth": {
-		"type": "bearer",
-		"bearer": [
-			{
-				"key": "token",
-				"value": "{{token}}",
-				"type": "string"
-			}
-		]
+		"type": "inherit"
 	},
 	"event": [
 		{
