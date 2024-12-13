@@ -12,7 +12,7 @@ import org.springframework.context.annotation.PropertySource;
 
 
 @SpringBootApplication
-@PropertySource("file:${user.dir}/.env")
+//@PropertySource("file:${user.dir}/.env")
 public class Application {
 
     private static final Logger log = LoggerFactory.getLogger(Application.class);
