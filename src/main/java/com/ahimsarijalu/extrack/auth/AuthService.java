@@ -22,13 +22,13 @@ public class AuthService implements UserDetailsService {
         return userRepository.findByEmail(username);
     }
 
-    public User register(RegisterDTO registerDTO) throws InvalidJwtException {
+    public void register(RegisterDTO registerDTO) throws InvalidJwtException {
         if (userRepository.findByEmail(registerDTO.getEmail()) != null) {
             throw new InvalidJwtException("Email already exists");
         }
         String encryptedPassword = new BCryptPasswordEncoder().encode(registerDTO.getPassword());
         User newUser = mapDTOToEntity(registerDTO, User.class);
         newUser.setPassword(encryptedPassword);
-        return userRepository.save(newUser);
+        userRepository.save(newUser);
     }
 }
