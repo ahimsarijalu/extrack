@@ -2,7 +2,6 @@ package com.ahimsarijalu.extrack.auth;
 
 import com.ahimsarijalu.extrack.user.User;
 import com.ahimsarijalu.extrack.user.UserRepository;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
