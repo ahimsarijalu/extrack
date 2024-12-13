@@ -52,7 +52,7 @@ An **Expenses Tracker App** built with **Spring Boot** and **PostgreSQL**, featu
    ```
 
 ### Access the Application
-- API documentation: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+- API documentation: [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
 - Test APIs with Postman (collection available).
 
 ## Postman Collection
