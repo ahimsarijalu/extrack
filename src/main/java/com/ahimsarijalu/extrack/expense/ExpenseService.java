@@ -99,4 +99,8 @@ public class ExpenseService {
                 .collect(Collectors.toList());
     }
 
+    public TopCategoryDTO findTopCategoryByUserId(String userId) {
+        return expenseRepository.findTopCategoryByUserId(UUID.fromString(userId));
+    }
+
 }
