@@ -9,4 +9,6 @@ import java.util.UUID;
 @Repository
 public interface FundRepository extends JpaRepository<Fund, UUID> {
     List<Fund> findAllByUserId(UUID userId);
+
+    Fund findByUserId(UUID userId);
 }

@@ -31,7 +31,7 @@ public class Fund {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "fund", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "fund", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Fetch(FetchMode.SELECT)
     private List<Expense> expenses = List.of();
 }

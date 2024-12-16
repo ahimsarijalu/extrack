@@ -38,7 +38,7 @@ public class FundController {
     public ResponseEntity<ApiResponse<List<FundDTO>>> getFundByUserId(@PathVariable String userId) {
         ApiResponse<List<FundDTO>> response;
         try {
-            List<FundDTO> funds = fundService.getFundByUserId(userId);
+            List<FundDTO> funds = fundService.getAllFundsByUserId(userId);
             response = mapToApiResponse(HttpStatus.OK.value(), true, "Funds fetched successfully", funds);
         } catch (Exception e) {
             response = mapToApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), false, "Failed to fetch funds, Reason: " + e.getMessage(), null);

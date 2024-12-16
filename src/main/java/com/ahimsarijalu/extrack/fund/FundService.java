@@ -31,11 +31,15 @@ public class FundService {
         return mapFundToDTO(fundRepository.save(fund));
     }
 
-    public List<FundDTO> getFundByUserId(String userId) {
+    public List<FundDTO> getAllFundsByUserId(String userId) {
         return fundRepository.findAllByUserId(UUID.fromString(userId))
                 .stream()
                 .map(FundUtils::mapFundToDTO)
                 .collect(Collectors.toList());
+    }
+
+    public FundDTO getFundByUserId(String userId) {
+        return mapFundToDTO(fundRepository.findByUserId(UUID.fromString(userId)));
     }
 
     public FundDTO getFundById(String userId, String fundId) {

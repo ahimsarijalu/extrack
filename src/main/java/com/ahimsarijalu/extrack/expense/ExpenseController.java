@@ -61,6 +61,7 @@ public class ExpenseController {
     public ResponseEntity<ApiResponse<ExpenseDTO>> createExpense(@RequestBody ExpenseDTO expenseDTO) {
         ApiResponse<ExpenseDTO> response;
         try {
+            log.info(expenseDTO.toString());
             ExpenseDTO responseDTO = expenseService.saveExpense(expenseDTO);
             response = mapToApiResponse(HttpStatus.CREATED.value(), true, "Expense saved successfully", responseDTO);
         } catch (Exception e) {

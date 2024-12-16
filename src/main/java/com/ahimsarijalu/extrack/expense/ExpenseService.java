@@ -1,5 +1,8 @@
 package com.ahimsarijalu.extrack.expense;
 
+import com.ahimsarijalu.extrack.fund.Fund;
+import com.ahimsarijalu.extrack.fund.FundNotFoundException;
+import com.ahimsarijalu.extrack.fund.FundRepository;
 import com.ahimsarijalu.extrack.user.User;
 import com.ahimsarijalu.extrack.user.UserNotFoundException;
 import com.ahimsarijalu.extrack.user.UserRepository;
@@ -25,6 +28,9 @@ public class ExpenseService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private FundRepository fundRepository;
+
     public List<ExpenseDTO> getAllExpenses() {
         return expenseRepository.findAll()
                 .stream()
@@ -42,8 +48,20 @@ public class ExpenseService {
         User user = userRepository.findById(UUID.fromString(expenseDTO.getUserId()))
                 .orElseThrow(() -> new UserNotFoundException(expenseDTO.getUserId()));
 
+        Fund fund = fundRepository.findById(UUID.fromString(expenseDTO.getFundId())).orElseThrow(() -> new FundNotFoundException(expenseDTO.getFundId()));
+
+        Long totalAmount = fund.getBalance() - expenseDTO.getAmount();
+        if (totalAmount < 0) {
+            throw new IllegalArgumentException("Total amount cannot be negative");
+        }
+
+        fund.setBalance(totalAmount);
+
         Expense expense = mapDTOToEntity(expenseDTO, Expense.class);
+
+        log.info(expense.toString());
         expense.setUser(user);
+        expense.setFund(fund);
         expense = expenseRepository.save(expense);
         return mapExpenseToDTO(expense);
     }

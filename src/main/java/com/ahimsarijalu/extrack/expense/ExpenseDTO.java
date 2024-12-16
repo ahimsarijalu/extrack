@@ -14,4 +14,5 @@ public class ExpenseDTO {
     private Category category;
     private LocalDateTime expenseDate;
     private String userId;
+    private String fundId;
 }

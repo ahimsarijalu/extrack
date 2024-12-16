@@ -1,5 +1,6 @@
 package com.ahimsarijalu.extrack.fund;
 
+import com.ahimsarijalu.extrack.expense.ExpenseUtil;
 import org.springframework.beans.BeanUtils;
 
 public class FundUtils {
@@ -8,6 +9,7 @@ public class FundUtils {
         BeanUtils.copyProperties(fund, fundDTO);
         fundDTO.setId(fund.getId().toString());
         fundDTO.setUserId(fund.getUser().getId().toString());
+        fundDTO.setExpenses(fund.getExpenses().stream().map(ExpenseUtil::mapExpenseToDTO).toList());
         return fundDTO;
     }
 }
