@@ -6,6 +6,7 @@ import com.ahimsarijalu.extrack.fund.FundRepository;
 import com.ahimsarijalu.extrack.user.User;
 import com.ahimsarijalu.extrack.user.UserNotFoundException;
 import com.ahimsarijalu.extrack.user.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -78,6 +79,11 @@ public class ExpenseService {
         }
         if (expenseDTO.getAmount() != null) {
             expense.setAmount(expenseDTO.getAmount());
+            long totalAmount = expense.getFund().getBalance() - expenseDTO.getAmount();
+            if (totalAmount < 0) {
+                throw new IllegalArgumentException("Total amount cannot be negative");
+            }
+            expense.getFund().setBalance(totalAmount);
         }
         if (expenseDTO.getCategory() != null) {
             expense.setCategory(expenseDTO.getCategory());
@@ -88,12 +94,24 @@ public class ExpenseService {
         mapExpenseToDTO(expenseRepository.save(expense));
     }
 
+    @Transactional
     public void deleteExpense(String id) {
-        if (expenseRepository.findById(UUID.fromString(id)).isEmpty()) {
-            throw new ExpenseNotFoundException(id);
-        }
-        expenseRepository.deleteById(UUID.fromString(id));
+        Expense expense = expenseRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new ExpenseNotFoundException(id));
 
+        Fund fund = expense.getFund();
+        long totalAmount = fund.getBalance() + expense.getAmount();
+        if (totalAmount < 0) {
+            throw new IllegalArgumentException("Total amount cannot be negative");
+        }
+
+        fund.setBalance(totalAmount);
+        fund.getExpenses().remove(expense);
+        fundRepository.save(fund);
+
+        expenseRepository.delete(expense);
+
+        log.info("Expense deleted successfully: {}", id);
     }
 
     public List<ExpenseDTO> getAllExpensesByCategory(Category category) {

@@ -9,13 +9,15 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.JdbcTypeCode;
 
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Table(name = "fund")
 @Entity
+@Table(name = "fund")
 @Data
 public class Fund {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @JdbcTypeCode(Types.VARCHAR)
@@ -28,10 +30,10 @@ public class Fund {
     private Long balance;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "fund", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "fund", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER, orphanRemoval = true)
     @Fetch(FetchMode.SELECT)
-    private List<Expense> expenses = List.of();
+    private List<Expense> expenses = new ArrayList<>();
 }
