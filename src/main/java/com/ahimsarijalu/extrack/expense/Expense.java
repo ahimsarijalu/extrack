@@ -1,5 +1,6 @@
 package com.ahimsarijalu.extrack.expense;
 
+import com.ahimsarijalu.extrack.fund.Fund;
 import com.ahimsarijalu.extrack.user.User;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -59,5 +60,9 @@ public class Expense {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "fund_id")
+    private Fund fund;
 
 }

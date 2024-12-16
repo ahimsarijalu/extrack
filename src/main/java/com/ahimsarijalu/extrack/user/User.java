@@ -1,6 +1,7 @@
 package com.ahimsarijalu.extrack.user;
 
 import com.ahimsarijalu.extrack.expense.Expense;
+import com.ahimsarijalu.extrack.fund.Fund;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,6 +28,7 @@ public class User implements UserDetails  {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @JdbcTypeCode(Types.VARCHAR)
     private UUID id;
+
     @Column(name = "name", nullable = false)
     private String name;
 
@@ -42,6 +44,10 @@ public class User implements UserDetails  {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Fetch(FetchMode.SELECT)
     private List<Expense> expenses = List.of();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SELECT)
+    private List<Fund> funds = List.of();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
