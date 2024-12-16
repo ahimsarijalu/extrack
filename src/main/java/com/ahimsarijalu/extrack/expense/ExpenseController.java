@@ -1,6 +1,7 @@
 package com.ahimsarijalu.extrack.expense;
 
 import com.ahimsarijalu.extrack.utils.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +10,7 @@ import java.util.List;
 
 import static com.ahimsarijalu.extrack.utils.MapperUtil.mapToApiResponse;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/expenses")
 public class ExpenseController {
@@ -116,6 +118,39 @@ public class ExpenseController {
                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
                     false,
                     "Failed to fetch expenses by category of " + category.toUpperCase() + ", Reason: " + e.getMessage(),
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/category/user/{userId}")
+    public ResponseEntity<ApiResponse<TopCategoryDTO>> getTopCategoryByUserId(@PathVariable String userId) {
+        ApiResponse<TopCategoryDTO> response;
+        try {
+            TopCategoryDTO expenses = expenseService.findTopCategoryByUserId(userId);
+
+            if (expenses == null) {
+                response = mapToApiResponse(
+                        HttpStatus.NOT_FOUND.value(),
+                        false,
+                        "Expenses by category of " + userId + " not found",
+                        null
+                );
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+            response = mapToApiResponse(
+                    HttpStatus.OK.value(),
+                    true,
+                    "Expenses by category of " + userId + " fetched successfully",
+                    expenses
+            );
+        } catch (Exception e) {
+            response = mapToApiResponse(
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    false,
+                    "Failed to fetch expenses by category of " + userId + ", Reason: " + e.getMessage(),
                     null
             );
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
