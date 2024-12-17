@@ -1,8 +1,8 @@
 package com.ahimsarijalu.extrack.fund;
 
 import com.ahimsarijalu.extrack.user.User;
-import com.ahimsarijalu.extrack.user.UserNotFoundException;
 import com.ahimsarijalu.extrack.user.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +24,7 @@ public class FundService {
 
     public FundDTO saveFund(String userId, FundDTO fundDTO) {
         User user = userRepository.findById(UUID.fromString(userId))
-                .orElseThrow(() -> new FundNotFoundException(fundDTO.getUserId()));
+                .orElseThrow(() -> new EntityNotFoundException("User not found with this id: " + userId));
 
         Fund fund = mapDTOToEntity(fundDTO, Fund.class);
         fund.setUser(user);
@@ -32,10 +32,16 @@ public class FundService {
     }
 
     public List<FundDTO> getAllFundsByUserId(String userId) {
-        return fundRepository.findAllByUserId(UUID.fromString(userId))
+        List<FundDTO> funds = fundRepository.findAllByUserId(UUID.fromString(userId))
                 .stream()
                 .map(FundUtils::mapFundToDTO)
                 .collect(Collectors.toList());
+
+        if (funds.isEmpty()) {
+            throw new EntityNotFoundException("No Funds found for this user");
+        }
+
+        return funds;
     }
 
     public FundDTO getFundByUserId(String userId) {
@@ -43,18 +49,18 @@ public class FundService {
     }
 
     public FundDTO getFundById(String userId, String fundId) {
-        User user = userRepository.findById(UUID.fromString(userId))
-                .orElseThrow(() -> new UserNotFoundException(userId));
+        userRepository.findById(UUID.fromString(userId))
+                .orElseThrow(() -> new EntityNotFoundException("User not found with this id: " + userId));
 
         return mapFundToDTO(fundRepository.findById(UUID.fromString(fundId))
-                .orElseThrow(() -> new FundNotFoundException(fundId)));
+                .orElseThrow(() -> new EntityNotFoundException("Fund not found with this id: " + fundId)));
     }
 
     public FundDTO updateFund(String userId, String fundId, FundDTO fundDTO) {
-        User user = userRepository.findById(UUID.fromString(userId))
-                .orElseThrow(() -> new UserNotFoundException(userId));
+        userRepository.findById(UUID.fromString(userId))
+                .orElseThrow(() -> new EntityNotFoundException("User not found with this id: " + userId));
         Fund fund = fundRepository.findById(UUID.fromString(fundId))
-                .orElseThrow(() -> new FundNotFoundException(fundId));
+                .orElseThrow(() -> new EntityNotFoundException("User not found with this id: " + fundId));
 
         if (fundDTO.getName() != null) {
             fund.setName(fundDTO.getName());
@@ -67,10 +73,10 @@ public class FundService {
     }
 
     public void deleteFund(String userId, String fundId) {
-        User user = userRepository.findById(UUID.fromString(userId))
-                .orElseThrow(() -> new UserNotFoundException(userId));
+        userRepository.findById(UUID.fromString(userId))
+                .orElseThrow(() -> new EntityNotFoundException("User not found with this id: " + userId));
         Fund fund = fundRepository.findById(UUID.fromString(fundId))
-                .orElseThrow(() -> new FundNotFoundException(fundId));
+                .orElseThrow(() -> new EntityNotFoundException("User not found with this id: " + fundId));
         fundRepository.delete(fund);
     }
 

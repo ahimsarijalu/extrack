@@ -6,6 +6,7 @@ import com.ahimsarijalu.extrack.fund.FundRepository;
 import com.ahimsarijalu.extrack.user.User;
 import com.ahimsarijalu.extrack.user.UserNotFoundException;
 import com.ahimsarijalu.extrack.user.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,16 +34,22 @@ public class ExpenseService {
     private FundRepository fundRepository;
 
     public List<ExpenseDTO> getAllExpenses() {
-        return expenseRepository.findAll()
+        List<ExpenseDTO> expenses = expenseRepository.findAll()
                 .stream()
                 .map(ExpenseUtil::mapExpenseToDTO)
                 .collect(Collectors.toList());
+
+        if (expenses.isEmpty()) {
+            throw new EntityNotFoundException("No Expenses found");
+        }
+
+        return expenses;
     }
 
     public ExpenseDTO getExpenseById(String id) {
         return expenseRepository.findById(UUID.fromString(id))
                 .map(ExpenseUtil::mapExpenseToDTO)
-                .orElseThrow(() -> new ExpenseNotFoundException(id));
+                .orElseThrow(() -> new EntityNotFoundException("Expense with id " + id + " not found"));
     }
 
     public ExpenseDTO saveExpense(ExpenseDTO expenseDTO) {
@@ -51,7 +58,7 @@ public class ExpenseService {
 
         Fund fund = fundRepository.findById(UUID.fromString(expenseDTO.getFundId())).orElseThrow(() -> new FundNotFoundException(expenseDTO.getFundId()));
 
-        Long totalAmount = fund.getBalance() - expenseDTO.getAmount();
+        long totalAmount = fund.getBalance() - expenseDTO.getAmount();
         if (totalAmount < 0) {
             throw new IllegalArgumentException("Total amount cannot be negative");
         }
@@ -60,7 +67,6 @@ public class ExpenseService {
 
         Expense expense = mapDTOToEntity(expenseDTO, Expense.class);
 
-        log.info(expense.toString());
         expense.setUser(user);
         expense.setFund(fund);
         expense = expenseRepository.save(expense);
@@ -97,7 +103,7 @@ public class ExpenseService {
     @Transactional
     public void deleteExpense(String id) {
         Expense expense = expenseRepository.findById(UUID.fromString(id))
-                .orElseThrow(() -> new ExpenseNotFoundException(id));
+                .orElseThrow(() -> new EntityNotFoundException("Expense with id " + id + " not found"));
 
         Fund fund = expense.getFund();
         long totalAmount = fund.getBalance() + expense.getAmount();
@@ -110,8 +116,6 @@ public class ExpenseService {
         fundRepository.save(fund);
 
         expenseRepository.delete(expense);
-
-        log.info("Expense deleted successfully: {}", id);
     }
 
     public List<ExpenseDTO> getAllExpensesByCategory(Category category) {
@@ -136,7 +140,13 @@ public class ExpenseService {
     }
 
     public TopCategoryDTO findTopCategoryByUserId(String userId) {
-        return expenseRepository.findTopCategoryByUserId(UUID.fromString(userId));
+        TopCategoryDTO topCategory = expenseRepository.findTopCategoryByUserId(UUID.fromString(userId));
+
+        if (topCategory == null) {
+            throw new EntityNotFoundException("Top category not found for user ID: " + userId);
+        }
+
+        return topCategory;
     }
 
 }

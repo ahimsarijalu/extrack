@@ -1,6 +1,7 @@
 package com.ahimsarijalu.extrack.fund;
 
 import com.ahimsarijalu.extrack.utils.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,67 +23,32 @@ public class FundController {
     }
 
     @PostMapping("/{userId}")
-    public ResponseEntity<ApiResponse<FundDTO>> createFundByUserId(@PathVariable String userId, @RequestBody FundDTO fundDTO) {
-        ApiResponse<FundDTO> response;
-        try {
-            FundDTO createdFund = fundService.saveFund(userId, fundDTO);
-            response = mapToApiResponse(HttpStatus.CREATED.value(), true, "Fund created successfully", createdFund);
-        } catch (Exception e) {
-            response = mapToApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), false, "Failed to create fund, Reason: " + e.getMessage(), null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ResponseEntity<ApiResponse<FundDTO>> createFundByUserId(@PathVariable String userId, @Valid @RequestBody FundDTO fundDTO) {
+        FundDTO createdFund = fundService.saveFund(userId, fundDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapToApiResponse(HttpStatus.CREATED.value(), true, "Fund created successfully", createdFund));
     }
 
     @GetMapping("/{userId}")
     public ResponseEntity<ApiResponse<List<FundDTO>>> getFundByUserId(@PathVariable String userId) {
-        ApiResponse<List<FundDTO>> response;
-        try {
-            List<FundDTO> funds = fundService.getAllFundsByUserId(userId);
-            response = mapToApiResponse(HttpStatus.OK.value(), true, "Funds fetched successfully", funds);
-        } catch (Exception e) {
-            response = mapToApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), false, "Failed to fetch funds, Reason: " + e.getMessage(), null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
-        return ResponseEntity.ok(response);
+        List<FundDTO> funds = fundService.getAllFundsByUserId(userId);
+        return ResponseEntity.ok(mapToApiResponse(HttpStatus.OK.value(), true, "Funds fetched successfully", funds));
     }
 
     @GetMapping("/{userId}/{id}")
     public ResponseEntity<ApiResponse<FundDTO>> getFundById(@PathVariable String userId, @PathVariable String id) {
-        ApiResponse<FundDTO> response;
-        try {
-            FundDTO fund = fundService.getFundById(userId, id);
-            response = mapToApiResponse(HttpStatus.OK.value(), true, "Fund fetched successfully", fund);
-        } catch (Exception e) {
-            response = mapToApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), false, "Failed to fetch fund, Reason: " + e.getMessage(), null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
-        return ResponseEntity.ok(response);
+        FundDTO fund = fundService.getFundById(userId, id);
+        return ResponseEntity.ok(mapToApiResponse(HttpStatus.OK.value(), true, "Fund fetched successfully", fund));
     }
 
     @PutMapping("/{userId}/{id}")
     public ResponseEntity<ApiResponse<FundDTO>> updateFund(@PathVariable String userId, @PathVariable String id, @RequestBody FundDTO fundDTO) {
-        ApiResponse<FundDTO> response;
-        try {
-            FundDTO updatedFund = fundService.updateFund(userId, id, fundDTO);
-            response = mapToApiResponse(HttpStatus.OK.value(), true, "Fund updated successfully", updatedFund);
-        } catch (Exception e) {
-            response = mapToApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), false, "Failed to update fund, Reason: " + e.getMessage(), null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
-        return ResponseEntity.ok(response);
+        FundDTO updatedFund = fundService.updateFund(userId, id, fundDTO);
+        return ResponseEntity.ok(mapToApiResponse(HttpStatus.OK.value(), true, "Fund updated successfully", updatedFund));
     }
 
     @DeleteMapping("/{userId}/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteFund(@PathVariable String userId, @PathVariable String id) {
-        ApiResponse<Void> response;
-        try {
-            fundService.deleteFund(userId, id);
-            response = mapToApiResponse(HttpStatus.OK.value(), true, "Fund deleted successfully", null);
-        } catch (Exception e) {
-            response = mapToApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), false, "Failed to delete fund, Reason: " + e.getMessage(), null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
-        return ResponseEntity.ok(response);
+        fundService.deleteFund(userId, id);
+        return ResponseEntity.ok(mapToApiResponse(HttpStatus.OK.value(), true, "Fund deleted successfully", null));
     }
 }

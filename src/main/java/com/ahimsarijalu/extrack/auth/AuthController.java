@@ -2,6 +2,7 @@ package com.ahimsarijalu.extrack.auth;
 
 import com.ahimsarijalu.extrack.user.User;
 import com.ahimsarijalu.extrack.utils.ApiResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,36 +30,22 @@ public class AuthController {
     private TokenProvider tokenProvider;
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<?>> register(@RequestBody RegisterDTO registerDTO) {
-        ApiResponse<?> response;
-        try {
-            authService.register(registerDTO);
-            response = mapToApiResponse(HttpStatus.CREATED.value(), true, "User registered successfully", null);
-        } catch (Exception e) {
-            response = mapToApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), false, "Failed to register user, Reason: " + e.getMessage(), null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ResponseEntity<ApiResponse<?>> register(@Valid @RequestBody RegisterDTO registerDTO) throws Exception {
+        authService.register(registerDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapToApiResponse(HttpStatus.CREATED.value(), true, "User registered successfully", null));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<?>> login(@RequestBody LoginDTO loginDTO) {
-        ApiResponse<?> response;
-        try {
-            var usernamePassword = new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword());
-            var authUser = authenticationManager.authenticate(usernamePassword);
-            var user = (User) authUser.getPrincipal();
-            var token = tokenProvider.generateAccessToken(user);
+    public ResponseEntity<ApiResponse<?>> login(@Valid @RequestBody LoginDTO loginDTO) {
 
-            var jwt = new LoginResponse();
-            jwt.setToken(token);
-            jwt.setUser(mapUserToDTO(user));
+        var usernamePassword = new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword());
+        var authUser = authenticationManager.authenticate(usernamePassword);
+        var user = (User) authUser.getPrincipal();
+        var token = tokenProvider.generateAccessToken(user);
 
-            response = mapToApiResponse(HttpStatus.OK.value(), true, "User logged in successfully", jwt);
-        } catch (Exception e) {
-            response = mapToApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), false, "Failed to login user", null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
-        return ResponseEntity.ok(response);
+        var jwt = new LoginResponse();
+        jwt.setToken(token);
+        jwt.setUser(mapUserToDTO(user));
+        return ResponseEntity.ok(mapToApiResponse(HttpStatus.OK.value(), true, "User logged in successfully", jwt));
     }
 }
