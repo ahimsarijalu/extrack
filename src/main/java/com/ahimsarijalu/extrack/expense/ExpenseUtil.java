@@ -8,6 +8,7 @@ public class ExpenseUtil {
         BeanUtils.copyProperties(expense, expenseDTO);
         expenseDTO.setId(expense.getId().toString());
         expenseDTO.setUserId(expense.getUser().getId().toString());
+        expenseDTO.setFundId(expense.getFund().getId().toString());
         return expenseDTO;
     }
 }

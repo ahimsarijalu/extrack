@@ -1,6 +1,7 @@
 package com.ahimsarijalu.extrack.expense;
 
 import com.ahimsarijalu.extrack.utils.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,161 +24,68 @@ public class ExpenseController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<ExpenseDTO>>> getAllExpenses() {
-        ApiResponse<List<ExpenseDTO>> response;
-        try {
-            List<ExpenseDTO> expenses = expenseService.getAllExpenses();
-            if (!expenses.isEmpty()) {
-                response = mapToApiResponse(HttpStatus.OK.value(), true, "Expense fetched successfully", expenses);
-            } else {
-                response = mapToApiResponse(HttpStatus.NOT_FOUND.value(), false, "Expense not found", null);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-            }
-        } catch (Exception e) {
-            response = mapToApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), false, "Failed to fetch expense", null);
-            return ResponseEntity.internalServerError().body(response);
-        }
-        return ResponseEntity.ok(response);
+
+        List<ExpenseDTO> expenses = expenseService.getAllExpenses();
+        return ResponseEntity.ok(mapToApiResponse(HttpStatus.OK.value(), true, "Expense fetched successfully", expenses));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ExpenseDTO>> getExpenseById(@PathVariable String id) {
-        ApiResponse<ExpenseDTO> response;
-        try {
-            ExpenseDTO expenseDTO = expenseService.getExpenseById(id);
-            if (expenseDTO != null) {
-                response = mapToApiResponse(HttpStatus.OK.value(), true, "Expense fetched successfully", expenseDTO);
-            } else {
-                response = mapToApiResponse(HttpStatus.NOT_FOUND.value(), false, "Expense not found", null);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-            }
-        } catch (Exception e) {
-            response = mapToApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), false, "Failed to fetch expense, Reason: " + e.getMessage(), null);
-            return ResponseEntity.internalServerError().body(response);
-        }
-        return ResponseEntity.ok(response);
+        ExpenseDTO expenseDTO = expenseService.getExpenseById(id);
+        return ResponseEntity.ok(mapToApiResponse(HttpStatus.OK.value(), true, "Expense fetched successfully", expenseDTO))
+                ;
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<ExpenseDTO>> createExpense(@RequestBody ExpenseDTO expenseDTO) {
-        ApiResponse<ExpenseDTO> response;
-        try {
-            ExpenseDTO responseDTO = expenseService.saveExpense(expenseDTO);
-            response = mapToApiResponse(HttpStatus.CREATED.value(), true, "Expense saved successfully", responseDTO);
-        } catch (Exception e) {
-            response = mapToApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), false, "Failed to save expense, Reason: " + e.getMessage(), null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ResponseEntity<ApiResponse<ExpenseDTO>> createExpense(@Valid @RequestBody ExpenseDTO expenseDTO) {
+        ExpenseDTO responseDTO = expenseService.saveExpense(expenseDTO);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapToApiResponse(HttpStatus.CREATED.value(), true, "Expense saved successfully", responseDTO));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<ExpenseDTO>> updateExpense(@PathVariable String id, @RequestBody ExpenseDTO expenseDTO) {
-        ApiResponse<ExpenseDTO> response;
-        try {
-            expenseService.updateExpense(id, expenseDTO);
-            ExpenseDTO updatedExpense = expenseService.getExpenseById(id);
-            response = mapToApiResponse(HttpStatus.OK.value(), true, "Expense updated successfully", updatedExpense);
-        } catch (Exception e) {
-            response = mapToApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), false, "Failed to update expense, Reason: " + e.getMessage(), null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        expenseService.updateExpense(id, expenseDTO);
+        ExpenseDTO updatedExpense = expenseService.getExpenseById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(mapToApiResponse(HttpStatus.OK.value(), true, "Expense updated successfully", updatedExpense));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteExpense(@PathVariable String id) {
-        ApiResponse<Void> response;
-        try {
-            expenseService.deleteExpense(id);
-            response = mapToApiResponse(HttpStatus.OK.value(), true, "Expense deleted successfully", null);
-        } catch (Exception e) {
-            if (e instanceof ExpenseNotFoundException) {
-                response = mapToApiResponse(HttpStatus.NOT_FOUND.value(), false, "Failed to delete expense, Reason: " + e.getMessage(), null);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-            }
-            response = mapToApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), false, "Failed to delete expense, Reason: " + e.getMessage(), null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        expenseService.deleteExpense(id);
+        return ResponseEntity.status(HttpStatus.OK).body(mapToApiResponse(HttpStatus.OK.value(), true, "Expense deleted successfully", null));
     }
 
     @GetMapping("/category/{category}")
     public ResponseEntity<ApiResponse<List<ExpenseDTO>>> getAllExpensesByCategory(@PathVariable String category) {
-        ApiResponse<List<ExpenseDTO>> response;
-        try {
-            List<ExpenseDTO> expenses = expenseService.getAllExpensesByCategory(Category.valueOf(category.toUpperCase()));
-            response = mapToApiResponse(
-                    HttpStatus.OK.value(),
-                    true,
-                    "Expenses by category of " + category.toUpperCase() + " fetched successfully",
-                    expenses
-            );
-
-        } catch (Exception e) {
-            response = mapToApiResponse(
-                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                    false,
-                    "Failed to fetch expenses by category of " + category.toUpperCase() + ", Reason: " + e.getMessage(),
-                    null
-            );
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        List<ExpenseDTO> expenses = expenseService.getAllExpensesByCategory(Category.valueOf(category.toUpperCase()));
+        return ResponseEntity.status(HttpStatus.OK).body(mapToApiResponse(
+                HttpStatus.OK.value(),
+                true,
+                "Expenses by category of " + category.toUpperCase() + " fetched successfully",
+                expenses
+        ));
     }
 
     @GetMapping("/category/user/{userId}")
     public ResponseEntity<ApiResponse<TopCategoryDTO>> getTopCategoryByUserId(@PathVariable String userId) {
-        ApiResponse<TopCategoryDTO> response;
-        try {
-            TopCategoryDTO expenses = expenseService.findTopCategoryByUserId(userId);
-
-            if (expenses == null) {
-                response = mapToApiResponse(
-                        HttpStatus.NOT_FOUND.value(),
-                        false,
-                        "Expenses by category of " + userId + " not found",
-                        null
-                );
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-            }
-            response = mapToApiResponse(
-                    HttpStatus.OK.value(),
-                    true,
-                    "Expenses by category of " + userId + " fetched successfully",
-                    expenses
-            );
-        } catch (Exception e) {
-            response = mapToApiResponse(
-                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                    false,
-                    "Failed to fetch expenses by category of " + userId + ", Reason: " + e.getMessage(),
-                    null
-            );
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        TopCategoryDTO expenses = expenseService.findTopCategoryByUserId(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(mapToApiResponse(
+                HttpStatus.OK.value(),
+                true,
+                "Expenses by category of " + userId + " fetched successfully",
+                expenses
+        ));
     }
 
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<List<ExpenseDTO>>> searchByTitleAndDescription(@RequestParam String query) {
-        ApiResponse<List<ExpenseDTO>> response;
-        try {
-            List<ExpenseDTO> expenses = expenseService.searchByTitleAndDescription(query);
-            response = mapToApiResponse(
-                    HttpStatus.OK.value(),
-                    true,
-                    "Expenses searched successfully",
-                    expenses
-            );
-        } catch (Exception e) {
-            response = mapToApiResponse(
-                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                    false,
-                    "Failed to search expenses, Reason: " + e.getMessage(),
-                    null
-            );
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        List<ExpenseDTO> expenses = expenseService.searchByTitleAndDescription(query);
+        return ResponseEntity.status(HttpStatus.OK).body(mapToApiResponse(
+                HttpStatus.OK.value(),
+                true,
+                "Expenses searched successfully",
+                expenses
+        ));
     }
 }

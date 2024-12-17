@@ -1,5 +1,6 @@
 package com.ahimsarijalu.extrack.user;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,16 +18,22 @@ public class UserService {
     private UserRepository userRepository;
 
     public List<UserDTO> getAllUsers() {
-        return userRepository.findAll()
+        List<UserDTO> users = userRepository.findAll()
                 .stream()
                 .map(UserUtils::mapUserToDTO)
                 .collect(Collectors.toList());
+
+        if (users.isEmpty()) {
+            throw new EntityNotFoundException("No users is found");
+        }
+
+        return users;
     }
 
     public UserDTO getUserById(String id) {
         return userRepository.findById(UUID.fromString(id))
                 .map(UserUtils::mapUserToDTO)
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(() -> new EntityNotFoundException("User with this id: " + id + " is not found"));
     }
 
     public UserDTO saveUser(UserDTO userDTO) {
@@ -38,7 +45,7 @@ public class UserService {
 
     public void updateUser(String id, UserDTO userDTO) {
         User user = userRepository.findById(UUID.fromString(id))
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(() -> new EntityNotFoundException("User with this id: " + id + " is not found"));
 
         if (userDTO.getName() != null) {
             user.setName(userDTO.getName());
@@ -55,7 +62,7 @@ public class UserService {
 
     public void deleteUser(String id) {
         if (userRepository.findById(UUID.fromString(id)).isEmpty()) {
-            throw new UserNotFoundException(id);
+            throw new EntityNotFoundException("User with this id: " + id + " is not found");
         }
         userRepository.deleteById(UUID.fromString(id));
     }

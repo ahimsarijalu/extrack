@@ -1,6 +1,7 @@
 package com.ahimsarijalu.extrack.user;
 
 import com.ahimsarijalu.extrack.expense.Expense;
+import com.ahimsarijalu.extrack.fund.Fund;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,21 +13,22 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-
 
 @Entity
 @Table(name = "users")
 @Data
 @EqualsAndHashCode(of = "id")
-public class User implements UserDetails  {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @JdbcTypeCode(Types.VARCHAR)
     private UUID id;
+
     @Column(name = "name", nullable = false)
     private String name;
 
@@ -39,9 +41,13 @@ public class User implements UserDetails  {
     @Column(name = "age", nullable = false)
     private Integer age;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SELECT)
+    private List<Expense> expenses = new ArrayList<>();
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Fetch(FetchMode.SELECT)
-    private List<Expense> expenses = List.of();
+    private List<Fund> funds = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

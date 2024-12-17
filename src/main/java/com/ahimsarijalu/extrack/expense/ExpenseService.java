@@ -1,8 +1,13 @@
 package com.ahimsarijalu.extrack.expense;
 
+import com.ahimsarijalu.extrack.fund.Fund;
+import com.ahimsarijalu.extrack.fund.FundNotFoundException;
+import com.ahimsarijalu.extrack.fund.FundRepository;
 import com.ahimsarijalu.extrack.user.User;
 import com.ahimsarijalu.extrack.user.UserNotFoundException;
 import com.ahimsarijalu.extrack.user.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,25 +30,45 @@ public class ExpenseService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private FundRepository fundRepository;
+
     public List<ExpenseDTO> getAllExpenses() {
-        return expenseRepository.findAll()
+        List<ExpenseDTO> expenses = expenseRepository.findAll()
                 .stream()
                 .map(ExpenseUtil::mapExpenseToDTO)
                 .collect(Collectors.toList());
+
+        if (expenses.isEmpty()) {
+            throw new EntityNotFoundException("No Expenses found");
+        }
+
+        return expenses;
     }
 
     public ExpenseDTO getExpenseById(String id) {
         return expenseRepository.findById(UUID.fromString(id))
                 .map(ExpenseUtil::mapExpenseToDTO)
-                .orElseThrow(() -> new ExpenseNotFoundException(id));
+                .orElseThrow(() -> new EntityNotFoundException("Expense with id " + id + " not found"));
     }
 
     public ExpenseDTO saveExpense(ExpenseDTO expenseDTO) {
         User user = userRepository.findById(UUID.fromString(expenseDTO.getUserId()))
                 .orElseThrow(() -> new UserNotFoundException(expenseDTO.getUserId()));
 
+        Fund fund = fundRepository.findById(UUID.fromString(expenseDTO.getFundId())).orElseThrow(() -> new FundNotFoundException(expenseDTO.getFundId()));
+
+        long totalAmount = fund.getBalance() - expenseDTO.getAmount();
+        if (totalAmount < 0) {
+            throw new IllegalArgumentException("Total amount cannot be negative");
+        }
+
+        fund.setBalance(totalAmount);
+
         Expense expense = mapDTOToEntity(expenseDTO, Expense.class);
+
         expense.setUser(user);
+        expense.setFund(fund);
         expense = expenseRepository.save(expense);
         return mapExpenseToDTO(expense);
     }
@@ -60,6 +85,11 @@ public class ExpenseService {
         }
         if (expenseDTO.getAmount() != null) {
             expense.setAmount(expenseDTO.getAmount());
+            long totalAmount = expense.getFund().getBalance() - expenseDTO.getAmount();
+            if (totalAmount < 0) {
+                throw new IllegalArgumentException("Total amount cannot be negative");
+            }
+            expense.getFund().setBalance(totalAmount);
         }
         if (expenseDTO.getCategory() != null) {
             expense.setCategory(expenseDTO.getCategory());
@@ -70,12 +100,22 @@ public class ExpenseService {
         mapExpenseToDTO(expenseRepository.save(expense));
     }
 
+    @Transactional
     public void deleteExpense(String id) {
-        if (expenseRepository.findById(UUID.fromString(id)).isEmpty()) {
-            throw new ExpenseNotFoundException(id);
-        }
-        expenseRepository.deleteById(UUID.fromString(id));
+        Expense expense = expenseRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new EntityNotFoundException("Expense with id " + id + " not found"));
 
+        Fund fund = expense.getFund();
+        long totalAmount = fund.getBalance() + expense.getAmount();
+        if (totalAmount < 0) {
+            throw new IllegalArgumentException("Total amount cannot be negative");
+        }
+
+        fund.setBalance(totalAmount);
+        fund.getExpenses().remove(expense);
+        fundRepository.save(fund);
+
+        expenseRepository.delete(expense);
     }
 
     public List<ExpenseDTO> getAllExpensesByCategory(Category category) {
@@ -100,7 +140,13 @@ public class ExpenseService {
     }
 
     public TopCategoryDTO findTopCategoryByUserId(String userId) {
-        return expenseRepository.findTopCategoryByUserId(UUID.fromString(userId));
+        TopCategoryDTO topCategory = expenseRepository.findTopCategoryByUserId(UUID.fromString(userId));
+
+        if (topCategory == null) {
+            throw new EntityNotFoundException("Top category not found for user ID: " + userId);
+        }
+
+        return topCategory;
     }
 
 }

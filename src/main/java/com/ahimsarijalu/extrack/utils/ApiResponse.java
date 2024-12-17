@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 
 import java.util.Optional;
 
@@ -16,4 +17,11 @@ public class ApiResponse<T> {
     private String message;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private T data;
+
+    public ApiResponse(HttpStatus httpStatus, Boolean success, String message, T data) {
+        this.status = httpStatus.value();
+        this.message = message;
+        this.success = success;
+        this.data = data;
+    }
 }

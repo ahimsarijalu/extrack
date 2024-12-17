@@ -1,5 +1,6 @@
 package com.ahimsarijalu.extrack.expense;
 
+import com.ahimsarijalu.extrack.fund.Fund;
 import com.ahimsarijalu.extrack.user.User;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -35,6 +36,11 @@ import java.util.UUID;
 )
 public class Expense {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @JdbcTypeCode(Types.VARCHAR)
+    private UUID id;
+
     @Column(name = "title")
     private String title;
 
@@ -51,13 +57,11 @@ public class Expense {
     @Column(name = "expense_date")
     private LocalDateTime expenseDate;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @JdbcTypeCode(Types.VARCHAR)
-    private UUID id;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "fund_id", nullable = false)
+    private Fund fund;
 }
