@@ -2,6 +2,7 @@ package com.ahimsarijalu.extrack.fund;
 
 import com.ahimsarijalu.extrack.expense.Expense;
 import com.ahimsarijalu.extrack.user.User;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.Fetch;
@@ -35,5 +36,6 @@ public class Fund {
 
     @OneToMany(mappedBy = "fund", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER, orphanRemoval = true)
     @Fetch(FetchMode.SELECT)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<Expense> expenses = new ArrayList<>();
 }
