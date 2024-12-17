@@ -10,10 +10,7 @@ public class UserUtils {
         UserDTO userDTO = new UserDTO();
         BeanUtils.copyProperties(user, userDTO);
         userDTO.setId(user.getId().toString());
-
-//        var expenses = user.getExpenses().stream().map(ExpenseUtil::mapExpenseToDTO).toList();
-
-        userDTO.setFunds(user.getFunds().stream().map(FundUtils::mapFundToDTO).collect(Collectors.toList()));
+        userDTO.setFunds(user.getFunds().stream().map(FundUtils::mapFundToDTOWithoutExpenses).collect(Collectors.toList()));
         return userDTO;
     }
 }

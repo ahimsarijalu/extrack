@@ -12,4 +12,13 @@ public class FundUtils {
         fundDTO.setExpenses(fund.getExpenses().stream().map(ExpenseUtil::mapExpenseToDTO).toList());
         return fundDTO;
     }
+
+    public static FundDTO mapFundToDTOWithoutExpenses(Fund fund) {
+        FundDTO fundDTO = new FundDTO();
+        BeanUtils.copyProperties(fund, fundDTO);
+        fundDTO.setId(fund.getId().toString());
+        fundDTO.setUserId(fund.getUser().getId().toString());
+//        fundDTO.setExpenses(fund.getExpenses().stream().map(ExpenseUtil::mapExpenseToDTO).toList());
+        return fundDTO;
+    }
 }
