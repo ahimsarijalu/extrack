@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
 
@@ -195,7 +196,34 @@ public class UserRepositoryTest {
     }
 
 
+    @Test
+    public void testFindByEmail_UserFound_ReturnsUserDetails() {
+        // Arrange
+        User user = getUser();
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(user);
 
+        // Act
+        UserDetails result = userRepository.findByEmail(user.getEmail());
+
+        // Assert
+        Assertions.assertThat(result).isNotNull();
+        Assertions.assertThat(result.getUsername()).isEqualTo(user.getEmail());
+        verify(userRepository, times(1)).findByEmail(user.getEmail());
+    }
+
+    @Test
+    public void testFindByEmail_NonExistentEmail_ReturnsNull() {
+        // Arrange
+        String nonExistentEmail = "nonexistent@example.com";
+        when(userRepository.findByEmail(nonExistentEmail)).thenReturn(null);
+
+        // Act
+        UserDetails result = userRepository.findByEmail(nonExistentEmail);
+
+        // Assert
+        Assertions.assertThat(result).isNull();
+        verify(userRepository, times(1)).findByEmail(nonExistentEmail);
+    }
 
     private User getUser() {
         User user = new User();
