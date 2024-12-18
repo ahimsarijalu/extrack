@@ -1,6 +1,7 @@
 package com.ahimsarijalu.extrack.fund;
 
 import com.ahimsarijalu.extrack.expense.ExpenseDTO;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -19,5 +20,6 @@ public class FundDTO {
 
     private String userId;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<ExpenseDTO> expenses;
 }
