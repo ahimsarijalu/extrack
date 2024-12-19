@@ -4,7 +4,6 @@ import com.ahimsarijalu.extrack.fund.Fund;
 import com.ahimsarijalu.extrack.fund.FundNotFoundException;
 import com.ahimsarijalu.extrack.fund.FundRepository;
 import com.ahimsarijalu.extrack.user.User;
-import com.ahimsarijalu.extrack.user.UserNotFoundException;
 import com.ahimsarijalu.extrack.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -54,7 +53,7 @@ public class ExpenseService {
 
     public ExpenseDTO saveExpense(ExpenseDTO expenseDTO) {
         User user = userRepository.findById(UUID.fromString(expenseDTO.getUserId()))
-                .orElseThrow(() -> new UserNotFoundException(expenseDTO.getUserId()));
+                .orElseThrow(() -> new EntityNotFoundException("User " + expenseDTO.getUserId() + " Not Found"));
 
         Fund fund = fundRepository.findById(UUID.fromString(expenseDTO.getFundId())).orElseThrow(() -> new FundNotFoundException(expenseDTO.getFundId()));
 
@@ -75,7 +74,7 @@ public class ExpenseService {
 
     public void updateExpense(String id, ExpenseDTO expenseDTO) {
         Expense expense = expenseRepository.findById(UUID.fromString(id))
-                .orElseThrow(() -> new ExpenseNotFoundException(id));
+                .orElseThrow(() -> new EntityNotFoundException("Expense with id " + id + " not found"));
 
         if (expenseDTO.getTitle() != null) {
             expense.setTitle(expenseDTO.getTitle());
